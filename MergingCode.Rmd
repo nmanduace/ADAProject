@@ -1,0 +1,51 @@
+---
+title: "Code for Mergining Data"
+author: "Nnenna Anako, Nicandro Mandujano Acevedo, Joanne Song"
+date: "4/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The original datasets are larger than 100MBs. Therefore they can not be uploaded to GitHub for everyone to work on. Additionally variables from multiple dataset needed to be merged. This to document the merging of dataset using only the variables that are going to be planned to be used.
+
+## Importing Data Set
+```{r}
+Individual<-read.delim("~/Desktop/DHS Data Files/DHSVI_Individual.txt") #Importing original dataset
+Member<-read.delim("~/Desktop/DHS Data Files/DHSVI_Housemem.txt") #Importing original dataset
+```
+
+## Selecting the variables from women
+```{r}
+library(dplyr)
+library(tidyverse)
+IndUse<- select(Individual,v001,v002,caseid,starts_with("d101"),d104,d106,d107,d108,d109,
+                starts_with("d119"),d120,starts_with("d115"),v012,v013,v190,v191,v502)
+```
+
+## Selecting the variables from household
+```{r}
+HouseUse<- select(Member,hv001,hv002,hv270,hv271,ha1,ha66,ha67)
+
+## Variables "hv001" and "hv002" need to be renamed so that they match the women individual variables for merging
+HouseUse<-rename(HouseUse, v001=hv001)
+HouseUse<-rename(HouseUse, v002=hv002)
+```
+
+##Merging the dataset
+```{r}
+#First need to sort the dataset based on "v001" and "v002"
+IndUse[with(IndUse, order(v001,v002)),] # Sorting the women dataframe
+
+HouseUse[with(HouseUse, order(v001,v002)),] # Sorting the household dataframe
+
+# Merge
+ADAProject<-merge(IndUse,HouseUse, by=c("v001","v002"))
+```
+
+## Export the data to be used for cleaning and analysis
+```{r}
+write.table(ADAProject, "~/Documents/GitHub/ADAProject/ADAProject.txt")
+```
