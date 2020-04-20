@@ -1,0 +1,50 @@
+---
+title: "Data Analysis"
+author: "Nnenna Anako, Joanne Song, Nicandro Mandujano Acevedo"
+date: "4/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+DHSdata <- read.csv("ADAProject.csv")
+```
+
+### Renaming Variables
+```{r}
+DHSdataC<-rename(DHSdata, Mother_PA=d115b, Father_PA=d115c, Daughter_PA=d115d, Son_PA=d115e, 
+                Sibling_PA=d115f, OtherRel_PA=d115g, FemRel_PA=d115h, MalRel_PA=d115i,
+                FPartner_PA=d115j, Cboy_PA=d115k, Fboy_PA=d115l, SMom_PA=d115m, SDad_PA=d115n,
+                LMom_PA=d115o, LDAD_PA=d115p, LOther_PA=d115q, LMOther_PA=d115r, 
+                FFriend_PA=d115s, MFriend_PA=d115t, Neigh_PA=d115u, Teach_PA=d115v, 
+                Emplo_PA=d115w, Other_PA=d115x, OnlySpouse_PA=d115y, Stranger_PA=d115xa,
+                OFeFam_PA=d115xb, OMaFam_PA=d115xc, Friend_PA=d115xd, Police_PA=d115xe, 
+                RegLead_PA=d115xf, Law_PA=d115xg, Doc_PA=d115xh, SSibling_PA=d115xi, Age=v012,
+                WealthIndex=v190, WealthScore=v191, UnionStatus=v502, EdLevel=ha66, 
+                YearEdu=ha67)
+```
+
+### Restricting data
+```{r}
+DHSAnSample<-subset(DHSdataC, d119y==1) #Those who reported not seeking help
+FinalSample<-subset(DHSAnSample, d104==1|d106==1|d107==1|d108==1) #Those whole expereinced any violence
+```
+
+## Renaming final variables
+```{r}
+# Renamig Variables for Analysis
+Final<-rename(FinalSample, ReasonNo=d120, EmoVio=d104, LessPA=d106, SeverePA=d107, SexVio=d108,
+                    FirstTimeVio=d109)
+
+#Filtering dara to only include variables that will be used
+DHS<-select(Final, caseid, Mother_PA:SSibling_PA, Age, WealthIndex, WealthScore, 
+            UnionStatus, EdLevel, YearEdu, ReasonNo, EmoVio, LessPA, SeverePA, SexVio, 
+            FirstTimeVio)
+
+```
+
+bh
