@@ -9,9 +9,14 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Importing Data and loading packages
 ```{r}
 DHSdata <- read.csv("NewADAProject.csv")
+
+library(dplyr)
+library(ggplot2)
+library(car)
+library(tidyverse)
 ```
 
 ### Renaming Variables
@@ -79,6 +84,8 @@ DHSdataC %>%
   theme_bw()
 ```
 
+__Based on the resulting plot, it appears that the distribution of children at home does not vary by ever experienced violence__
+
 2. Determining if running age and number children living in the household can be run as continuous variables
 
 ```{r}
@@ -97,9 +104,166 @@ boxTidwellChild <- glm(AnyVio ~ ChildHouseLive + child.times.logchild, data=DHSd
 summary(boxTidwellChild)
 ```
 
-__Based on the box Tidwell results, neither the age or children living at home variables should be run a continuous. Therefore categorical variables need to be created for children living at home__
+__Based on the box Tidwell results, neither the age or children living at home variables should be run a continuous. Therefore categorical variables need to be created for children living at home. Age already has a categorical varaible__
 
+A. Creating a categorical variable for children living in the home
 ```{r}
 #Creating a categorical variable for children living at home
+DHSdataC$ChildHouse_Cat<-car::recode(DHSdataC$ChildHouseLive, "0='0'; 1:2='1-2'; 3:4='3-4'; else='5 or more'")
+
+# Checking if categorical variable worked
+ggplot(DHSdataC, aes(x=ChildHouse_Cat))+ geom_bar ()
+
+# Factor and relabel
+DHSdataC$ChildHouse_Cat<-as.factor(DHSdataC$ChildHouse_Cat)
+
+# Visualizing that the age categorical variable is correct
+ggplot(DHSdataC, aes(x=Age_Cat))+ geom_bar ()
+
+# CHeck to see if the are any missing variables
+table(DHSdataC$ChildHouse_Cat)
+table(DHSdataC$Age_Cat)
+```
+
+3. Running Univariate logictic regeression model with only the number of children living at home
+```{r}
+# Children living at home logistic model
+ChildLogit <- glm(AnyVio ~ ChildHouse_Cat, data=DHSdataC, family="binomial")
+summary(ChildLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORChild<-exp(cbind(OR = coef(ChildLogit), confint(ChildLogit))) #calculate ORs and 95% CIs
+ORChild #print ORs and 95% CIs
 
 ```
+
+_None are significant_
+
+4. Running a multavariate model
+```{r}
+# Checking to see what is the class of the other categorical variables
+class(DHSdataC$WealthIndex)
+class(DHSdataC$TypeRes)
+
+# Since all variables are factors, model can go ahead and be run
+# Multivariate model
+ChildMLogit <- glm(AnyVio ~ ChildHouse_Cat + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(ChildMLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORChildM<-exp(cbind(OR = coef(ChildMLogit), confint(ChildMLogit))) #calculate ORs and 95% CIs
+ORChildM #print ORs and 95% CIs
+
+```
+
+_No children cat are significant_
+
+## Model 2 - Whether women currently working
+
+1. Examining the distribution of women currently working by ever expereinced violence
+```{r}
+# Since these are categorical variables a two way table would be best look at the distribution
+DHSdataC$Working<-dplyr::na_if(DHSdataC$Working, 9)
+
+DHSdataC$Working<-car::recode(DHSdataC$Working, "0='Not Working'; 1='Currently Working'")
+
+table(DHSdataC$AnyVio, DHSdataC$Working)
+```
+
+2. Running Univariate logictic regeression model with only working status of women
+```{r}
+# Working status logistic model
+WorkingLogit <- glm(AnyVio ~ Working, data=DHSdataC, family="binomial")
+summary(WorkingLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORWorking<-exp(cbind(OR = coef(WorkingLogit), confint(WorkingLogit))) #calculate ORs and 95% CIs
+ORWorking #print ORs and 95% CIs
+
+```
+
+_Working status not significant_
+
+3. Running a multavariate model for working status
+```{r}
+# Multivariate model
+WorkingMLogit <- glm(AnyVio ~ Working + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(WorkingMLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORWorkingM<-exp(cbind(OR = coef(WorkingMLogit), confint(WorkingMLogit))) #calculate ORs and 95% CIs
+ORWorkingM #print ORs and 95% CIs
+```
+_Not working become protective against violence_
+
+## Model 3 - Partner drinking
+
+1. Examining the distribution of partner drinking status by ever expereinced violence
+```{r}
+# Since these are categorical variables a two way table would be best look at the distribution
+class(DHSdataC$PartDrink)
+DHSdataC$PartDrink<=as.factor(DHSdataC$PartDrink)
+
+DHSdataC$PartDrink<-dplyr::na_if(DHSdataC$PartDrink, 8)
+DHSdataC$PartDrink<-dplyr::na_if(DHSdataC$PartDrink, 9)
+
+DHSdataC$PartDrink<-car::recode(DHSdataC$PartDrink, "0='Not Drinker'; 1='Drinker'")
+
+table(DHSdataC$AnyVio, DHSdataC$PartDrink)
+```
+_Based on this there might be a ralation between whether partner drinks and experiencing any violence
+
+2. Running Univariate logictic regeression model with partner drinking status
+```{r}
+# Partner Drink status logistic model
+DrinkLogit <- glm(AnyVio ~ PartDrink, data=DHSdataC, family="binomial")
+summary(DrinkLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORDrink<-exp(cbind(OR = coef(DrinkLogit), confint(DrinkLogit))) #calculate ORs and 95% CIs
+ORDrink #print ORs and 95% CIs
+
+```
+_Partner not being a drinker is a protective factor_
+
+3. Running a multavariate model for partner drinking status
+```{r}
+# Multivariate model
+DrinkMLogit <- glm(AnyVio ~ PartDrink + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(DrinkMLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORDrinkM<-exp(cbind(OR = coef(DrinkMLogit), confint(DrinkMLogit))) #calculate ORs and 95% CIs
+ORDrinkM #print ORs and 95% CIs
+```
+
+_Protective effect slightly increases_
+
+## 4 - Running model with all IV variables
+
+1. Running model with only the three IV of interests
+
+```{r}
+# Only IV
+AllLogit <- glm(AnyVio ~ ChildHouse_Cat + Working + PartDrink, data=DHSdataC, family="binomial")
+summary(AllLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORAll<-exp(cbind(OR = coef(AllLogit), confint(AllLogit))) #calculate ORs and 95% CIs
+ORAll #print ORs and 95% CIs
+```
+
+_Two significant predictor is partner not drinking (protective), and having more than 5 children (risk)_
+
+2. Running final model with all IV and controls
+```{r}
+# IV and controls
+FinalLogit <- glm(AnyVio ~ ChildHouse_Cat + Working + PartDrink + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(FinalLogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORFinal<-exp(cbind(OR = coef(FinalLogit), confint(FinalLogit))) #calculate ORs and 95% CIs
+ORFinal #print ORs and 95% CIs
+```
+
+_Not working becomes protective, more than 5 children risk, not drinker protective_
