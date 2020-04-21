@@ -27,7 +27,7 @@ IndUse<- select(Individual,v001,v002,caseid,starts_with("d101"),d104,d106,d107,d
 
 ## Selecting the variables from household
 ```{r}
-HouseUse<- select(Member,hv001,hv002,hv012)
+HouseUse<- select(Member,hv001,hv002,hv012, ha66, ha67)
 
 ## Variables "hv001" and "hv002" need to be renamed so that they match the women individual variables for merging
 HouseUse<-rename(HouseUse, v001=hv001)
