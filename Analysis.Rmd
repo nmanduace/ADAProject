@@ -16,6 +16,7 @@ DHSdata <- read.csv("ADAProject.csv")
 
 ### Renaming Variables
 ```{r}
+# Rename variables of who perpetuates violence
 DHSdataC<-rename(DHSdata, Mother_PA=d115b, Father_PA=d115c, Daughter_PA=d115d, Son_PA=d115e, 
                 Sibling_PA=d115f, OtherRel_PA=d115g, FemRel_PA=d115h, MalRel_PA=d115i,
                 FPartner_PA=d115j, Cboy_PA=d115k, Fboy_PA=d115l, SMom_PA=d115m, SDad_PA=d115n,
@@ -25,25 +26,30 @@ DHSdataC<-rename(DHSdata, Mother_PA=d115b, Father_PA=d115c, Daughter_PA=d115d, S
                 OFeFam_PA=d115xb, OMaFam_PA=d115xc, Friend_PA=d115xd, Police_PA=d115xe, 
                 RegLead_PA=d115xf, Law_PA=d115xg, Doc_PA=d115xh, SSibling_PA=d115xi, Age=v012,
                 WealthIndex=v190, WealthScore=v191, UnionStatus=v502, EdLevel=ha66, 
-                YearEdu=ha67)
+                YearEdu=ha67, EmoVio=d104, LessPA=d106, SeverPA=d107, SexVio=d108)
 ```
 
-### Restricting data
+### Creating a new Variable for those that have experienced any form of violenve
 ```{r}
-DHSAnSample<-subset(DHSdataC, d119y==1) #Those who reported not seeking help
-FinalSample<-subset(DHSAnSample, d104==1|d106==1|d107==1|d108==1) #Those whole expereinced any violence
-```
+DHSdataC$EmoVio <- as.factor(DHSdataC$EmoVio)
+DHSdataC$LessPA <- as.factor(DHSdataC$LessPA)
+DHSdataC$SeverPA <- as.factor(DHSdataC$SeverPA)
+DHSdataC$SexVio <- as.factor(DHSdataC$SexVio)
 
-## Renaming final variables
-```{r}
-# Renamig Variables for Analysis
-Final<-rename(FinalSample, ReasonNo=d120, EmoVio=d104, LessPA=d106, SeverePA=d107, SexVio=d108,
-                    FirstTimeVio=d109)
+DHSdataC$EmoVio<-dplyr::na_if(DHSdataC$EmoVio, 9)
+DHSdataC$LessPA<-dplyr::na_if(DHSdataC$LessPA, 9)
+DHSdataC$SexVio<-dplyr::na_if(DHSdataC$SexVio, 9)
+DHSdataC$SeverPA<-dplyr::na_if(DHSdataC$SeverPA, 9)
 
-#Filtering dara to only include variables that will be used
-DHS<-select(Final, caseid, Mother_PA:SSibling_PA, Age, WealthIndex, WealthScore, 
-            UnionStatus, EdLevel, YearEdu, ReasonNo, EmoVio, LessPA, SeverePA, SexVio, 
-            FirstTimeVio, d119y)
 
+DHSdataC$AnyVio <- ifelse(DHSdataC$EmoVio==1|DHSdataC$LessPA==1|DHSdataC$SeverPA==1|
+                            DHSdataC$SexVio==1,1,0)
+
+DHSdataC$AnyVio<-as.factor(DHSdataC$AnyVio)
+
+DHSdataC %>% 
+  filter(!is.na(AnyVio)) %>% 
+ggplot(aes(x=AnyVio))+
+  geom_bar(na.rm = T)
 ```
 
