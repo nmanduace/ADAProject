@@ -43,8 +43,7 @@ Final<-rename(FinalSample, ReasonNo=d120, EmoVio=d104, LessPA=d106, SeverePA=d10
 #Filtering dara to only include variables that will be used
 DHS<-select(Final, caseid, Mother_PA:SSibling_PA, Age, WealthIndex, WealthScore, 
             UnionStatus, EdLevel, YearEdu, ReasonNo, EmoVio, LessPA, SeverePA, SexVio, 
-            FirstTimeVio)
+            FirstTimeVio, d119y)
 
 ```
 
-bh
