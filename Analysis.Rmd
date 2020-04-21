@@ -18,9 +18,9 @@ DHSdata <- read.csv("NewADAProject.csv")
 ```{r}
 # Rename variables of who perpetuates violence
 DHSdataC<-rename(DHSdata, Age=v012, Age_Cat=v013, WealthIndex=v190, WealthScore=v191, 
-                 UnionStatus=v502, EdLevel=ha66, YearEdu=ha67, EmoVio=d104, LessPA=d106, 
+                 UnionStatus=v502, EmoVio=d104, LessPA=d106, 
                  SeverPA=d107, SexVio=d108, HouseholdLiving=hv012, SonsLivingH=v202, 
-                 DaughtersLivingH=v203,Working=v714, TypeRes=v140)
+                 DaughtersLivingH=v203,Working=v714, TypeRes=v140, PartDrink=d113)
 ```
 
 ### Recode a variable for total children living at home
@@ -56,3 +56,50 @@ ggplot(aes(x=AnyVio))+
   geom_bar(na.rm = T)
 ```
 
+# RUNNING LOGISTIC REGRESSIONS
+Four models to be run:
+1- Children living in household plus controls
+2- Work plus control
+3- Partner drinks plus control
+4- All independent variables controls
+
+### Model 1 - Children living in the household as IV
+
+1. Examining the distribution of children living in the household by ever expereinced violence
+```{r}
+#Make labels for ever expereinced violence
+DHSdataC$AnyVio<- factor(DHSdataC$AnyVio, labels = c("Never Experienced", "Experienced Any"))
+
+#Make box-plot 
+DHSdataC %>%
+  drop_na(c(AnyVio, ChildHouseLive)) %>%
+  ggplot(aes(x = AnyVio, y = ChildHouseLive)) +
+  geom_boxplot(aes(fill = AnyVio)) +
+  labs(x = "Any Violence", y = "Children Living in Household") +
+  theme_bw()
+```
+
+2. Determining if running age and number children living in the household can be run as continuous variables
+
+```{r}
+#linearity for age
+age.times.logage <- DHSdataC$Age * log(DHSdataC$Age)#create term to test linearity
+
+boxTidwellAge <- glm(AnyVio ~ Age + age.times.logage, data=DHSdataC, family="binomial") #Box Tidwell technique, test the assumption of linearity
+
+summary(boxTidwellAge)
+
+#linearity for children
+child.times.logchild <- DHSdataC$ChildHouseLive * log(DHSdataC$ChildHouseLive)#create term to test linearity
+
+boxTidwellChild <- glm(AnyVio ~ ChildHouseLive + child.times.logchild, data=DHSdataC, family="binomial") #Box Tidwell technique, test the assumption of linearity
+
+summary(boxTidwellChild)
+```
+
+__Based on the box Tidwell results, neither the age or children living at home variables should be run a continuous. Therefore categorical variables need to be created for children living at home__
+
+```{r}
+#Creating a categorical variable for children living at home
+
+```
