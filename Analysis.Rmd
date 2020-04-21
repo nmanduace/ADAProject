@@ -11,42 +11,45 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 ```{r}
-DHSdata <- read.csv("ADAProject.csv")
+DHSdata <- read.csv("NewADAProject.csv")
 ```
 
 ### Renaming Variables
 ```{r}
 # Rename variables of who perpetuates violence
-DHSdataC<-rename(DHSdata, Mother_PA=d115b, Father_PA=d115c, Daughter_PA=d115d, Son_PA=d115e, 
-                Sibling_PA=d115f, OtherRel_PA=d115g, FemRel_PA=d115h, MalRel_PA=d115i,
-                FPartner_PA=d115j, Cboy_PA=d115k, Fboy_PA=d115l, SMom_PA=d115m, SDad_PA=d115n,
-                LMom_PA=d115o, LDAD_PA=d115p, LOther_PA=d115q, LMOther_PA=d115r, 
-                FFriend_PA=d115s, MFriend_PA=d115t, Neigh_PA=d115u, Teach_PA=d115v, 
-                Emplo_PA=d115w, Other_PA=d115x, OnlySpouse_PA=d115y, Stranger_PA=d115xa,
-                OFeFam_PA=d115xb, OMaFam_PA=d115xc, Friend_PA=d115xd, Police_PA=d115xe, 
-                RegLead_PA=d115xf, Law_PA=d115xg, Doc_PA=d115xh, SSibling_PA=d115xi, Age=v012,
-                WealthIndex=v190, WealthScore=v191, UnionStatus=v502, EdLevel=ha66, 
-                YearEdu=ha67, EmoVio=d104, LessPA=d106, SeverPA=d107, SexVio=d108)
+DHSdataC<-rename(DHSdata, Age=v012, Age_Cat=v013, WealthIndex=v190, WealthScore=v191, 
+                 UnionStatus=v502, EdLevel=ha66, YearEdu=ha67, EmoVio=d104, LessPA=d106, 
+                 SeverPA=d107, SexVio=d108, HouseholdLiving=hv012, SonsLivingH=v202, 
+                 DaughtersLivingH=v203,Working=v714, TypeRes=v140)
+```
+
+### Recode a variable for total children living at home
+```{r}
+DHSdataC<-dplyr::mutate(DHSdataC, ChildHouseLive = SonsLivingH + DaughtersLivingH)
 ```
 
 ### Creating a new Variable for those that have experienced any form of violenve
 ```{r}
+#Firdst need to make this a factor
 DHSdataC$EmoVio <- as.factor(DHSdataC$EmoVio)
 DHSdataC$LessPA <- as.factor(DHSdataC$LessPA)
 DHSdataC$SeverPA <- as.factor(DHSdataC$SeverPA)
 DHSdataC$SexVio <- as.factor(DHSdataC$SexVio)
 
+# Make all 9 be NAs
 DHSdataC$EmoVio<-dplyr::na_if(DHSdataC$EmoVio, 9)
 DHSdataC$LessPA<-dplyr::na_if(DHSdataC$LessPA, 9)
 DHSdataC$SexVio<-dplyr::na_if(DHSdataC$SexVio, 9)
 DHSdataC$SeverPA<-dplyr::na_if(DHSdataC$SeverPA, 9)
 
-
+# Make varible for if any type of violence
 DHSdataC$AnyVio <- ifelse(DHSdataC$EmoVio==1|DHSdataC$LessPA==1|DHSdataC$SeverPA==1|
                             DHSdataC$SexVio==1,1,0)
 
+# Change yo factor
 DHSdataC$AnyVio<-as.factor(DHSdataC$AnyVio)
 
+#Plotting to make sure it worked
 DHSdataC %>% 
   filter(!is.na(AnyVio)) %>% 
 ggplot(aes(x=AnyVio))+
