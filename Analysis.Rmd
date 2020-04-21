@@ -158,6 +158,16 @@ ORChildM #print ORs and 95% CIs
 
 _No children cat are significant_
 
+5. Looking at influential cases
+
+```{r}
+#Create a graph of CD of the points/observations in the data to help guide which points may have undue influence in the model
+plot(ChildMLogit, which=4, id.n=5, col="red") 
+
+```
+
+NOT SURE HOW TO ACTUALLY SEE WHAT ID THAT IS!!!!!
+
 ## Model 2 - Whether women currently working
 
 1. Examining the distribution of women currently working by ever expereinced violence
@@ -195,6 +205,16 @@ ORWorkingM<-exp(cbind(OR = coef(WorkingMLogit), confint(WorkingMLogit))) #calcul
 ORWorkingM #print ORs and 95% CIs
 ```
 _Not working become protective against violence_
+
+4. Looking at influential cases
+
+```{r}
+#Create a graph of CD of the points/observations in the data to help guide which points may have undue influence in the model
+plot(WorkingMLogit, which=4, id.n=5, col="red") 
+
+```
+
+NOT SURE HOW TO FIGURE OUT WHICH ID THAT IS EITHER!!!
 
 ## Model 3 - Partner drinking
 
@@ -239,6 +259,16 @@ ORDrinkM #print ORs and 95% CIs
 
 _Protective effect slightly increases_
 
+4. Looking at influential cases
+
+```{r}
+#Create a graph of CD of the points/observations in the data to help guide which points may have undue influence in the model
+plot(DrinkMLogit, which=4, id.n=5, col="red") 
+
+```
+
+AGAIN NOT SURE HOW TO GET THE ID OF THAT SPECIFIC ID
+
 ## 4 - Running model with all IV variables
 
 1. Running model with only the three IV of interests
@@ -267,3 +297,13 @@ ORFinal #print ORs and 95% CIs
 ```
 
 _Not working becomes protective, more than 5 children risk, not drinker protective_
+
+3. Looking at influential cases
+
+```{r}
+#Create a graph of CD of the points/observations in the data to help guide which points may have undue influence in the model
+plot(FinalLogit, which=4, id.n=5, col="red") 
+
+```
+
+AGAIN NOT SURE HOW TO GET THE ID FOR THIS CASE?
