@@ -230,6 +230,9 @@ DHSdataC$PartDrink<-dplyr::na_if(DHSdataC$PartDrink, 9)
 DHSdataC$PartDrink<-car::recode(DHSdataC$PartDrink, "0='Not Drinker'; 1='Drinker'")
 
 table(DHSdataC$AnyVio, DHSdataC$PartDrink)
+
+# Setting "Nor drinker to be level 0
+DHSdataC$PartDrink[DHSdataC$PartDrink=='Not Drinker']<-0
 ```
 _Based on this there might be a ralation between whether partner drinks and experiencing any violence
 
