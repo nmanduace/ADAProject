@@ -22,12 +22,12 @@ Member<-read.delim("~/Desktop/DHS Data Files/DHSVI_Housemem.txt") #Importing ori
 library(dplyr)
 library(tidyverse)
 IndUse<- select(Individual,v001,v002,caseid,starts_with("d101"),d104,d106,d107,d108,d109,
-                starts_with("d119"),d120,starts_with("d115"),v012,v013,v190,v191,v502)
+                d113,d120,v012,v013,v190,v191,v502,v714,v202,v203,v025,v140)
 ```
 
 ## Selecting the variables from household
 ```{r}
-HouseUse<- select(Member,hv001,hv002,hv270,hv271,ha1,ha66,ha67)
+HouseUse<- select(Member,hv001,hv002,hv012)
 
 ## Variables "hv001" and "hv002" need to be renamed so that they match the women individual variables for merging
 HouseUse<-rename(HouseUse, v001=hv001)
@@ -45,7 +45,12 @@ HouseUse[with(HouseUse, order(v001,v002)),] # Sorting the household dataframe
 ADAProject<-merge(IndUse,HouseUse, by=c("v001","v002"))
 ```
 
+## Only keeping those observations that were ever married
+```{r}
+ADAProjectRes<-subset(ADAProject, v502 !="Never in union")
+```
+
 ## Export the data to be used for cleaning and analysis
 ```{r}
-write.table(ADAProject, "~/Documents/GitHub/ADAProject/ADAProject.txt")
+write.csv(ADAProjectRes, "~/Documents/Github/ADAProject/NewADAProject.csv")
 ```
