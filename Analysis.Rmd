@@ -231,7 +231,7 @@ DHSdataC$PartDrink<-car::recode(DHSdataC$PartDrink, "0='Not Drinker'; 1='Drinker
 
 table(DHSdataC$AnyVio, DHSdataC$PartDrink)
 
-# Setting "Nor drinker to be level 0
+# Setting "Not drinker" to be level 0
 DHSdataC$PartDrink[DHSdataC$PartDrink=='Not Drinker']<-0
 ```
 _Based on this there might be a ralation between whether partner drinks and experiencing any violence
@@ -310,3 +310,24 @@ plot(FinalLogit, which=4, id.n=5, col="red")
 ```
 
 AGAIN NOT SURE HOW TO GET THE ID FOR THIS CASE?
+
+
+**********************************************
+Code for getting metrics for Table 1
+**********************************************
+```{r}
+# First need full analytical sample
+DHSdataFull<- filter(DHSdataC, !is.na(AnyVio))
+DHSdataFull2<- filter(DHSdataC, !is.na(AnyVio) & !is.na(Age_Cat) & !is.na(WealthIndex) & !is.na(TypeRes) & !is.na(ChildHouse_Cat) & !is.na(Working) & !is.na(PartDrink))
+```
+```{r}
+# Getting values
+table(DHSdataFull2$Age_Cat) # Age
+table(DHSdataFull2$AnyVio) # Violence
+table(DHSdataFull2$WealthIndex) # Wealth Index
+table(DHSdataFull2$ChildHouse_Cat) # Number of children living in the household
+table(DHSdataFull2$Working) # Employment status
+table(DHSdataFull2$PartDrink) # Spouse drinking status
+table(DHSdataFull2$TypeRes) # Type of residence
+
+```
