@@ -331,3 +331,54 @@ table(DHSdataFull2$PartDrink) # Spouse drinking status
 table(DHSdataFull2$TypeRes) # Type of residence
 
 ```
+
+**********************************************
+Code for Presentation Responses
+**********************************************
+1. Model for Emotional Violence
+
+```{r}
+# Emotional Violence and controls
+EmotionalLogit <- glm(EmoVio ~ ChildHouse_Cat + Working + PartDrink + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(EmotionalLogit)
+  
+# Calculate and print ORs and 95% CIs  
+OREmotional<-exp(cbind(OR = coef(EmotionalLogit), confint(EmotionalLogit))) #calculate ORs and 95% CIs
+OREmotional #print ORs and 95% CIs
+```
+
+2. Model for Less Severe Physical Violence
+
+```{r}
+# Less Severe Physical Violence and controls
+LPALogit <- glm(LessPA ~ ChildHouse_Cat + Working + PartDrink + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(LPALogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORLPA<-exp(cbind(OR = coef(LPALogit), confint(LPALogit))) #calculate ORs and 95% CIs
+ORLPA #print ORs and 95% CIs
+```
+
+3. Model for Severe Physical Violence
+
+```{r}
+# Severe Physical Violence and controls
+SPALogit <- glm(SeverPA ~ ChildHouse_Cat + Working + PartDrink + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(SPALogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORSPA<-exp(cbind(OR = coef(SPALogit), confint(SPALogit))) #calculate ORs and 95% CIs
+ORSPA #print ORs and 95% CIs
+```
+
+4. Model for Sexual Violence
+
+```{r}
+# Sexual Violence and controls
+SexLogit <- glm(SexVio ~ ChildHouse_Cat + Working + PartDrink + Age_Cat + WealthIndex + TypeRes, data=DHSdataC, family="binomial")
+summary(SPALogit)
+  
+# Calculate and print ORs and 95% CIs  
+ORSex<-exp(cbind(OR = coef(SexLogit), confint(SexLogit))) #calculate ORs and 95% CIs
+ORSex #print ORs and 95% CIs
+```
